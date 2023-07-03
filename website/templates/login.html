@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+
+<form method="POST">
+    <h3 align="center">Connexion</h3>
+    <div class="form-group">
+      <label for="email">Adresse e-mail</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        placeholder="Saisir l'adresse e-mail"
+      />
+    </div>
+    <div class="form-group">
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        class="form-control"
+        id="password"
+        name="password"
+        placeholder="Saisir le mot de passe"
+      />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Connexion</button>
+  </form>
+
+
+{% endblock %}

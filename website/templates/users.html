@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Utilisateurs{% endblock %}
+
+{% block content %}
+<h3 align="center">Utilisateurs</h3>
+
+<form method="POST" class="form-inline">
+    <label class="sr-only" for="email">Adresse e-mail</label>
+    <div class="input-group mb-2 mr-sm-2">
+        <div class="input-group-prepend">
+            <div class="input-group-text">@</div>
+        </div>
+
+        <input type="email" class="form-control" id="email" name="email" placeholder="Saisir l'adresse e-mail" />
+    </div>
+    <br />
+    <label class="sr-only" for="name">Name</label>
+    <div class="input-group mb-2 mr-sm-2">
+        <input type="text" class="form-control" id="name" name="name" placeholder="Saisir le nom" />
+    </div>
+    <br />
+    <div class="form-check form-check-inline">
+        <input type="checkbox" class="form-check-input" id="admin" name="admin" />
+        <label class="form-check-label" for="admin">Rendre administrateur</label>
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary mb-2">Ajouter l'utilisateur</button>
+</form>
+
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                {% for header in headings %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for users in userDB|reverse %}
+            <tr>
+                {% for type in ("id","email","name","quota","admin") %}
+
+                {% if type=='admin' %}
+                    {% if users[type] %}
+                        <td style="color: green;">Oui</td>
+                    {% else %}
+                    <td style="color: gray;">Non</td>
+                    {% endif %}
+                {% else %}
+                <td>{{ users[type] }}</td>
+                {% endif %}
+
+                
+                
+                {% endfor %}
+                <td>
+                {% if user.id != users.id and not users.admin %}
+                <button type="button" class="close" onClick="deleteUser({{ users.id }})">
+                    <span aria-hidden="true">&times;</span>
+                </button>                    
+                {% endif %}
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

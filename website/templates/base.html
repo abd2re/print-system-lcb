@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    crossorigin="anonymous" />
+  <script type="module">
+    import * as print from "https://printjs-4de6.kxcdn.com/print.min.js"
+  </script>
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favico.ico') }}">
+</head>
+
+<body>
+  <div class="loader"></div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" id="demo" style="color: lightblue"></a>
+        </li>
+        {% if user.is_authenticated %}
+        {% if user.admin %}
+        <li class="nav-item">
+          <a class="nav-item nav-link" id="prints" href="/prints">Imprimer</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link" id="prints" href="/queue">File d'attente ({{ printDB|length - printDB|sum(attribute="completed") }})</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-item nav-link" id="notify" href="/notify">Notifier les utilisateurs</a>
+        </li>
+        {% endif %}
+
+      </ul>
+      {% if user.admin %}
+      <a class="nav-item nav-link" id="prints" href="/users">Utilisateurs</a>
+      {% endif %}
+      <a class="nav-item nav-link" id="logout" href="/logout">Déconnexion</a>
+      <span class="navbar-text">{{ user.email }}</span>
+      {% endif %}
+    </div>
+  </nav>
+
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %} {% if category ==
+  'error' %}
+  <div class="alert alert-danger alter-dismissable fade show" role="alert">
+    {{ message }}
+    <button type="button" class="close" data-dismiss="alert">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  {% elif category == 'notify' %}
+  <div class="alert alert-warning" role="alert">
+    {{ message }}
+  </div>
+  {% else %}
+  <div id="alert" class="alert alert-success" role="alert">
+    {{ message }}
+  </div>
+  {% endif %} {% endfor %} {% endif %} {% endwith %}
+
+  <div class="container">{% block content %} {% endblock %}</div>
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+    integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+    integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+  <script type="text/javascript">
+    setTimeout(function () {
+
+      $('#alert').alert('close');
+    }, 2000);
+  </script>
+
+  {% block javascript %}
+  <script type="text/javascript">
+    function deleteUser(userId) {
+      fetch("/delete_user", {
+        method: "POST",
+        body: JSON.stringify({ userId: userId }),
+      }).then((_res) => {
+        window.location.href = "/users";
+      });
+    }
+
+    function deleteElem(elemId) {
+      fetch("/delete_elem", {
+        method: "POST",
+        body: JSON.stringify({ elemId: elemId }),
+      }).then((_res) => {
+        window.location.href = "/prints";
+      });
+    }
+    var myVar;
+
+    window.addEventListener("load", () => {
+      const loader = document.querySelector(".loader");
+    
+      loader.classList.add("loader--hidden");
+    
+      loader.addEventListener("transitionend", () => {
+        document.body.removeChild(loader);
+      });
+    });
+    
+    
+  </script>
+  <style>
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e5e5e533;
+      transition: opacity 0.75s, visibility 0.75s;
+    }
+    
+    .loader--hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .loader::after {
+      content: "";
+      width: 75px;
+      height: 75px;
+      border: 15px solid #dddddd;
+      border-top-color: #00a6ed;
+      border-radius: 50%;
+      animation: loading 0.75s ease infinite;
+    }
+    
+    @keyframes loading {
+      from {
+        transform: rotate(0turn);
+      }
+      to {
+        transform: rotate(1turn);
+      }
+    }
+  </style>
+  {% endblock %}
+</body>
+
+</html>

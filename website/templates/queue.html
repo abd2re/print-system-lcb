@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}File d'attente{% endblock %}
+
+{% block content %}
+
+
+<h3 align="center">File d'attente d'impression</h3>    
+<button onClick="window.location.reload();" class="btn btn-primary btn-sm">&#8634;</button>  
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                {% for header in headings %}
+                {% if header=='Status' %}
+                <th>
+                    {{ header }}
+                </th>
+                {% else %}
+                    <th>{{ header }}</th>
+                {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for elem in printDB|sort(attribute='due_date') %}
+            {% if not elem.completed %}
+            <tr>
+                <td>
+                <form method="POST">
+                    <button type="submit" class="btn btn-success" id="printing" name="printing" value="{{ elem.id }}">&#x2713;</button>
+                </form>
+                </td>
+                {% for type in
+                ('id','user','filename','file_path','copies','double_sided','nice_date','quota','comments') %}
+                {% if type == 'double_sided' %}
+                {% if elem[type] %}
+                <td style="color: green;">Oui</td>
+                {% else %}
+                <td style="color: red;">Non</td>
+                {% endif %}
+                {% elif type == 'user' %}
+                <td>
+                    <a href="mailto:{{ elem['user_email'] }}">{{ elem['user_email'] }}</a>
+                    {{ elem['user_name'] }}
+                </td>
+                {% elif type == "file_path" %}
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="printDoc('{{ elem.true_file_path }}', '{{ elem.copies }}', {{ elem.double_sided|lower }}, {{ elem.id }})">
+                    Imprimer
+                    </button>
+                    <a href="{{ elem.file_path }}" download>Télécharger</a>
+                </td>
+                {% elif type == "filename" %}
+                <td style="word-break: break-all">{{ elem[type] }}</td> 
+                {% else %}
+                <td>{{ elem[type] }}</td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+            {% endif %}
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<h3 align="center">Impressions terminées</h3>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                {% for header in headings2 %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for elem in printDB|sort(attribute='due_date') %}
+            {% if elem.completed %}
+            <tr>
+                {% for type in
+                ('id','user','filename','file_path','copies','double_sided','nice_date','quota','comments') %}
+                {% if type == 'double_sided' %}
+                {% if elem[type] %}
+                <td>Oui</td>
+                {% else %}
+                <td>Non</td>
+                {% endif %}
+                {% elif type == 'user' %}
+                <td>
+                    {{ elem['user_email'] }}
+                    {{ elem['user_name'] }}
+                </td>
+                {% elif type == "filename" %}
+                <td style="word-break: break-all">{{ elem[type] }}</td> 
+                {% elif type == "file_path" %}
+                <td><a href="{{ elem.file_path }}" download>Télécharger</a></td>
+                {% else %}
+                <td>{{ elem[type] }}</td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+            {% endif %}
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function printDoc(file_path, copies, double_sided, id){
+        if (double_sided==true){
+            document.getElementById('demo').innerHTML = "id:"+id+" | Copies:" + copies + " (Recto-verso)";
+        } else {
+            document.getElementById('demo').innerHTML = "id:"+id+" | Copies:" + copies;
+        }
+
+        printJS({
+            printable: file_path,
+            onPrintDialogClose: () => {        
+                const handler = () => {
+                    // Make sure the event only happens once.
+                    window.removeEventListener ('mouseover', handler)
+
+                    document.getElementById('demo').innerHTML = "";
+                    document.getElementById('demoId').innerHTML = "";
+
+                    // Remove iframe from the DOM, by default 'printJS'
+                    const iframe = document.getElementById (frameId)
+
+                    if (iframe) {
+                    iframe.remove ()
+                    }
+                }
+                setTimeout (() => {window.addEventListener ('mouseover', handler)}, 1000)
+            }
+        });
+        
+
+    } 
+</script>
+
+{% endblock %}

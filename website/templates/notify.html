@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Notifier les utilisateurs{% endblock %}
+
+{% block content %}
+<h3 align="center">Envoyer une notification aux utilisateurs</h3>
+{% if not issue %}
+    <form method="POST" class="form-inline">
+        <label class="sr-only" for="notify">Message de notification</label>
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">!</div>
+            </div>
+
+            <input style="width: 800px;" type="text" class="form-control" id="message" name="message" placeholder="Message de notification" />
+        </div>
+
+        <br />
+        <button type="submit" class="btn btn-primary mb-2">Envoyer une notification</button>
+    </form>  
+{% else %}
+    <form method="POST" class="form-inline">
+        <label class="sr-only" for="notify">Message de notification</label>
+        <div class="input-group mb-2 mr-sm-2">
+            <div class="input-group-prepend">
+                <div class="input-group-text">!</div>
+            </div>
+
+            <input style="width: 800px;" type="text" class="form-control" placeholder="{{ message }}" readonly/>
+        </div>
+
+        <br />
+        <button type="submit" class="btn btn-danger mb-2">Supprimer la notification</button>
+    </form>    
+{% endif %}
+
+
+
+{% endblock %}
