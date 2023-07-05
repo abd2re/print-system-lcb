@@ -234,14 +234,6 @@ def queue():
                 delete(elem.true_filename)
             except:
                 pass
-            try:
-                os.remove(os.path.join("website/static/uploads",elem.true_filename))
-            except:
-                pass
-        try:
-            os.remove(os.path.join("website/static/uploads",elem.filename))
-        except:
-            pass
         user = User.query.get(int(elem.user_id))
         user.quota -= elem.quota
         flash('Impression du document confirmé', category='success')
