@@ -208,7 +208,7 @@ def delete_elem():
         
 
 
-queue_headings = ("ID","Utilisateur","Nom de fichier","Fichier","Copies","Recto-verso","Date d'échéance","Quota","Commentaires supplémentaires","Terminée ?")
+queue_headings = ("ID","Utilisateur","Nom de fichier","Fichier","Copies","Recto-verso","Date d'échéance","Quota","Commentaires supplémentaires","Terminée?")
 queue_headings_out = ("ID","Utilisateur","Nom de fichier","Fichier","Copies","Recto-verso","Date d'échéance","Quota","Commentaires supplémentaires")
 
 @views.route('/queue', methods=['GET', 'POST'])
