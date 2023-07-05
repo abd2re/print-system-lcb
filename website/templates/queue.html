@@ -27,11 +27,6 @@
             {% for elem in printDB|sort(attribute='due_date') %}
             {% if not elem.completed %}
             <tr>
-                <td>
-                <form method="POST">
-                    <button type="submit" class="btn btn-success" id="printing" name="printing" value="{{ elem.id }}">&#x2713;</button>
-                </form>
-                </td>
                 {% for type in
                 ('id','user','filename','file_path','copies','double_sided','nice_date','quota','comments') %}
                 {% if type == 'double_sided' %}
@@ -58,6 +53,11 @@
                 <td>{{ elem[type] }}</td>
                 {% endif %}
                 {% endfor %}
+                <td>
+                <form method="POST">
+                    <button type="submit" class="btn btn-success" id="printing" name="printing" value="{{ elem.id }}">&#x2713;</button>
+                </form>
+                </td>
             </tr>
             {% endif %}
 
@@ -99,7 +99,12 @@
                 {% elif type == "filename" %}
                 <td style="word-break: break-all">{{ elem[type] }}</td> 
                 {% elif type == "file_path" %}
-                <td><a href="{{ elem.file_path }}" download>Télécharger</a></td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="printDoc('{{ elem.true_file_path }}', '{{ elem.copies }}', {{ elem.double_sided|lower }}, {{ elem.id }})">
+                        Re-imprimer
+                    </button>
+                    <a href="{{ elem.file_path }}" download>Télécharger</a>
+                </td>
                 {% else %}
                 <td>{{ elem[type] }}</td>
                 {% endif %}
