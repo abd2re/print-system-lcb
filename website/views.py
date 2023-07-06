@@ -51,7 +51,7 @@ def convert(path,true_path):
 
 views = Blueprint('views',__name__)
 
-default_password = "lcb"
+default_password = DEFAULT_PASSWORD
 
 headings = ("ID","E-mail","Nom","Quota","Administrateur")
 
@@ -90,6 +90,7 @@ def create_user():
             db.session.add(new_user)
             db.session.commit()
             flash("Compte utilisateur ajouté !",category="success")
+            new_user_mail(new_user)
             return redirect(url_for('views.create_user'))
 
     return render_template("users.html",headings=headings,user=current_user,userDB=User.query.all(), printDB=printDoc.query.all())
@@ -301,6 +302,8 @@ Quota de l'impression: {elem.quota}
 
 Quota restant apres cette impression: {user.quota}
 
+Vous pouvez voir toutes vos impressions sur ce lien: {WEBSITE}/prints
+
 Merci, lcb-impression
 '''
 
@@ -320,4 +323,29 @@ Merci, lcb-impression
     server.sendmail(sender_email, receiver_email, message.as_string())
     server.quit()
     
+def new_user_mail(user):
+    email_address = user.email
+    email_subject = "Monsieur/Madame {user.name}, votre compte a été enregistré pour le système d'impression"
+    email_message = f'''Connectez vous avec les identifiants ci-desosus dans {WEBSITE} pour pouvoir utiliser le service
 
+Email: {user.email}
+Mot de passe: {DEFAULT_PASSWORD}
+
+Merci, lcb-impression
+'''
+
+    sender_email = SENDER_EMAIL
+    sender_password = SENDER_PASSWORD
+    receiver_email = email_address
+
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = receiver_email
+    message['Subject'] = email_subject
+    message.attach(MIMEText(email_message, 'plain'))
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(sender_email, sender_password)
+    server.sendmail(sender_email, receiver_email, message.as_string())
+    server.quit()

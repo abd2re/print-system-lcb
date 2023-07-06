@@ -21,6 +21,8 @@ SENDER_EMAIL = getenv("SENDER_EMAIL")
 SENDER_PASSWORD = getenv("SENDER_PASSWORD")
 EMAIL = getenv("EMAIL")
 PASSWORD = getenv("PASSWORD")
+DEFAULT_PASSWORD = getenv("DEFAULT_PASSWORD")
+WEBSITE = getenv("WEBSITE")
 
 
 def init_app():    
