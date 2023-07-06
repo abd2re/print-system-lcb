@@ -93,7 +93,7 @@
                 {% endif %}
                 {% elif type == 'user' %}
                 <td>
-                    {{ elem['user_email'] }}
+                    <a href="mailto:{{ elem['user_email'] }}">{{ elem['user_email'] }}</a>
                     {{ elem['user_name'] }}
                 </td>
                 {% elif type == "filename" %}
