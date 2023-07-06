@@ -325,7 +325,7 @@ Merci, lcb-impression
     
 def new_user_mail(user):
     email_address = user.email
-    email_subject = "Monsieur/Madame {user.name}, votre compte a été enregistré pour le système d'impression"
+    email_subject = f"Monsieur/Madame {user.name}, votre compte a été enregistré pour le système d'impression"
     email_message = f'''Connectez vous avec les identifiants ci-desosus dans {WEBSITE} pour pouvoir utiliser le service
 
 Email: {user.email}
