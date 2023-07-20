@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 db = SQLAlchemy()
-debug_mode = True
+debug_mode = False
 
 SECRET_KEY = getenv("SECRET_KEY")
 SQLALCHEMY_DATABASE_URI = getenv("SQLALCHEMY_DATABASE_URI")
