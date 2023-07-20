@@ -20,7 +20,7 @@
         <div class="input-group-prepend">
             <div class="input-group-text" >Nombre de copies</div>
           </div>
-        <input type="number" class="form-control" id="copies" name="copies" placeholder="(1-100)" />
+        <input type="number" min="1" class="form-control" id="copies" name="copies" placeholder="(1-100)" oninput="validity.valid||(value='');"/>
     </div>
     <br />
 
@@ -35,7 +35,7 @@
     <label class="sr-only" for="due_date">A imprimer avant le</label>
     <div class="input-group mb-2 mr-sm-2">
         <div class="input-group-prepend">
-            <div class="input-group-text">Date d'échéance</div>
+            <div class="input-group-text">Date et heure d'échéance</div>
           </div>
         <input type="datetime-local" class="form-control" id="due_date" name="due_date" placeholder="Imprimer la date et l'heure d'échéance" />
     </div>
@@ -115,7 +115,8 @@ uploadField.onchange = function() {
        this.value = "";
     };
 };
-
+var today = new Date().toISOString().slice(0, 16);
+document.getElementsByName("due_date")[0].min = today;
 </script>
 
 
