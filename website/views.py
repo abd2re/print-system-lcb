@@ -32,8 +32,8 @@ def upload(filepath,filename):
               
 def dropbox_get_link(filename):
     try:
-        shared_link_metadata = dbx.sharing_create_shared_link_with_settings(f"/uploads/{filename}")
-        shared_link = shared_link_metadata.url
+        shared_link_metadata = dbx.sharing_create_shared_link(f"/uploads/{filename}")
+        shared_link = shared_link_metadata.url 
         return shared_link.replace('?dl=0', '?dl=1').replace("www.dropbox","dl.dropboxusercontent")
     except dropbox.exceptions.ApiError as exception:
         if exception.error.is_shared_link_already_exists():
@@ -161,27 +161,32 @@ def prints():
                 quota = (num_of_pages(path)//2+num_of_pages(path)%2)*int(copies)
             else:
                 quota = num_of_pages(path)*int(copies)
-            if ext in ('.docx','.doc'):
-                true_filename = name+"_pdf.pdf"
-                true_path = os.path.join("website/", true_filename)
-                convert(path, true_path)
-                true_path = os.path.join("website/", true_filename)
-                upload(true_path,true_filename)
-                os.remove(true_path)
-            else:
-                true_filename = document.filename
-                true_path = path
-            upload(path,document.filename)
-            os.remove(path)
-            true_date = date_processing(due_date)
-            if quota > current_user.quota:
+            if quota > current_user.quota-sum([elem.quota for elem in current_user.prints if not elem.completed]):
+                flash(f"Attendez que certains de vos impressions soient terminés ou supprimez certains impressions",category="error")
+                os.remove(path)
+            elif quota > current_user.quota:
                 flash(f"Quota dépassé ({quota}), essayez d'imprimer recto-verso, imprimez moins de copies ou contactez un administrateur",category="error")
+                os.remove(path)
             else:
+                if ext in ('.docx','.doc'):
+                    true_filename = name+"_pdf.pdf"
+                    true_path = os.path.join("website/", true_filename)
+                    convert(path, true_path)
+                    true_path = os.path.join("website/", true_filename)
+                    upload(true_path,true_filename)
+                    os.remove(true_path)
+                else:
+                    true_filename = document.filename
+                    true_path = path
+                upload(path,document.filename)
+                os.remove(path)
+                true_date = date_processing(due_date)
                 dbx_path = dropbox_get_link(document.filename)
                 dbx_true_path = dropbox_get_link(true_filename)
                 new_print = printDoc(filename=document.filename,file_path=dbx_path,true_filename=true_filename,true_file_path=dbx_true_path,copies=copies,double_sided=double_sided,comments=comments,due_date=due_date,nice_date=true_date,completed=False,user_id=current_user.id,user_email=current_user.email,user_name=current_user.name,quota=quota)
                 db.session.add(new_print)
                 db.session.commit()
+                print(sum([elem.quota for elem in current_user.prints]))
                 flash("Nouvelle impression envoyée !", category="success")
             return redirect(url_for('views.prints'))
 
