@@ -161,11 +161,11 @@ def prints():
                 quota = (num_of_pages(path)//2+num_of_pages(path)%2)*int(copies)
             else:
                 quota = num_of_pages(path)*int(copies)
-            if quota > current_user.quota-sum([elem.quota for elem in current_user.prints if not elem.completed]):
-                flash(f"Attendez que certains de vos impressions soient terminés ou supprimez certains impressions",category="error")
-                os.remove(path)
-            elif quota > current_user.quota:
+            if quota > current_user.quota:
                 flash(f"Quota dépassé ({quota}), essayez d'imprimer recto-verso, imprimez moins de copies ou contactez un administrateur",category="error")
+                os.remove(path)
+            elif quota > current_user.quota-sum([elem.quota for elem in current_user.prints if not elem.completed]):
+                flash(f"Attendez que certains de vos impressions soient terminés ou supprimez certains impressions",category="error")
                 os.remove(path)
             else:
                 if ext in ('.docx','.doc'):
