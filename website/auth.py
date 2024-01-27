@@ -9,7 +9,9 @@ auth = Blueprint('auth',__name__)
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if db.session.query(User.id).first() is None:
-        user = User(email=EMAIL,name="abd2re",password=generate_password_hash(PASSWORD, method='sha256'),quota=1000,first_time=False,admin=True)
+        user = User(email=EMAIL,name="abd2re",
+                    password=generate_password_hash(PASSWORD, method='sha256'),
+                    quota=1000,first_time=False,admin=True)
         db.session.add(user)
         db.session.commit()
     if request.method == "POST":

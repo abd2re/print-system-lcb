@@ -3,13 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path, environ
 from flask_login import LoginManager
 import sqlalchemy as sa
-from os import getenv
 from werkzeug.security import generate_password_hash
+
+
+db = SQLAlchemy()
+debug_mode = True
+
+from os import getenv
 from dotenv import load_dotenv
 load_dotenv()
 
-db = SQLAlchemy()
-debug_mode = False
 
 SECRET_KEY = getenv("SECRET_KEY")
 SQLALCHEMY_DATABASE_URI = getenv("SQLALCHEMY_DATABASE_URI")

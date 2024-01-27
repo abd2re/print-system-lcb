@@ -9,9 +9,9 @@ class User(db.Model, UserMixin):
     quota = db.Column(db.Integer)
     first_time = db.Column(db.Boolean)
     admin = db.Column(db.Boolean)
-    prints = db.relationship('printDoc')
+    prints = db.relationship('Print_job')
 
-class printDoc(db.Model):
+class Print_job(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(100))
     true_filename = db.Column(db.String(100))

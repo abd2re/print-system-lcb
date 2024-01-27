@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User, printDoc, Notification
+from .models import User, Print_job, Notification
 from . import *
 from flask_login import login_user, login_required, logout_user, current_user
 from io import BytesIO
@@ -46,7 +46,8 @@ def delete(filename):
 
 convertapi.api_secret = CONVERTAPI_SECRET
 def convert(path,true_path):
-    convertapi.convert('pdf', {'File': path}, from_format = 'docx').save_files(true_path)
+    convertapi.convert('pdf', {'File': path}, 
+                       from_format = 'docx').save_files(true_path)
 
 
 views = Blueprint('views',__name__)
@@ -86,14 +87,19 @@ def create_user():
         elif user:
             flash('L\'e-mail existe déjà', category='error')
         else:
-            new_user = User(email=email,name=name,password=generate_password_hash(default_password, method='sha256'),quota=1000,first_time=True,admin=admin)
+            new_user = User(email=email,name=name,
+                            password=generate_password_hash(default_password, 
+                                                            method='sha256'),
+                            quota=1000,first_time=True,admin=admin)
             db.session.add(new_user)
             db.session.commit()
             flash("Compte utilisateur ajouté !",category="success")
             new_user_mail(new_user)
             return redirect(url_for('views.create_user'))
 
-    return render_template("users.html",headings=headings,user=current_user,userDB=User.query.all(), printDB=printDoc.query.all())
+    return render_template("users.html",headings=headings,
+                           user=current_user,userDB=User.query.all(), 
+                           printDB=Print_job.query.all())
 
 
 @views.route('/delete_user', methods=['POST'])
@@ -152,7 +158,7 @@ def prints():
             flash("Choisissez une date et une heure d'impression",category="error")
         else:
             document.filename = secure_filename(document.filename)
-            if printDoc.query.filter_by(filename=document.filename).first():
+            if Print_job.query.filter_by(filename=document.filename).first():
                 document.filename = str(random.randint(0,9999)) + document.filename
             path = os.path.join("website/", document.filename)
             document.save(path)
@@ -183,14 +189,14 @@ def prints():
                 true_date = date_processing(due_date)
                 dbx_path = dropbox_get_link(document.filename)
                 dbx_true_path = dropbox_get_link(true_filename)
-                new_print = printDoc(filename=document.filename,file_path=dbx_path,true_filename=true_filename,true_file_path=dbx_true_path,copies=copies,double_sided=double_sided,comments=comments,due_date=due_date,nice_date=true_date,completed=False,user_id=current_user.id,user_email=current_user.email,user_name=current_user.name,quota=quota)
+                new_print = Print_job(filename=document.filename,file_path=dbx_path,true_filename=true_filename,true_file_path=dbx_true_path,copies=copies,double_sided=double_sided,comments=comments,due_date=due_date,nice_date=true_date,completed=False,user_id=current_user.id,user_email=current_user.email,user_name=current_user.name,quota=quota)
                 db.session.add(new_print)
                 db.session.commit()
                 print(sum([elem.quota for elem in current_user.prints]))
                 flash("Nouvelle impression envoyée !", category="success")
             return redirect(url_for('views.prints'))
 
-    return render_template("prints.html",headings=print_headings,user=current_user, printDB=printDoc.query.all())
+    return render_template("prints.html",headings=print_headings,user=current_user, printDB=Print_job.query.all())
 
         
 @views.route('/delete_elem', methods=['POST'])
@@ -198,7 +204,7 @@ def prints():
 def delete_elem():
     elem = json.loads(request.data)
     elemId = elem['elemId']
-    elem = printDoc.query.get(elemId)
+    elem = Print_job.query.get(elemId)
     if elem:
         try:
             delete(elem.filename)
@@ -233,7 +239,7 @@ def queue():
         pass
     if request.method == "POST":
         elem_id = request.form.get("printing")
-        elem = printDoc.query.get(int(elem_id))
+        elem = Print_job.query.get(int(elem_id))
         elem.completed = True
         if elem.file_path != elem.true_file_path:
             try:
@@ -247,7 +253,7 @@ def queue():
         send_mail(user,elem)
         
         return redirect(url_for('views.queue'))
-    return render_template("queue.html",headings=queue_headings,user=current_user,printDB=printDoc.query.all(),headings2=queue_headings_out)
+    return render_template("queue.html",headings=queue_headings,user=current_user,printDB=Print_job.query.all(),headings2=queue_headings_out)
 
 def num_of_pages(filepath):
     extension = os.path.splitext(filepath)[1]
@@ -293,7 +299,7 @@ def notify():
         
         return redirect(url_for('views.notify'))       
     
-    return render_template("notify.html", issue=notif.issue, message=notif.message, user=current_user, printDB=printDoc.query.all())
+    return render_template("notify.html", issue=notif.issue, message=notif.message, user=current_user, printDB=Print_job.query.all())
 
 
 def send_mail(user,elem):

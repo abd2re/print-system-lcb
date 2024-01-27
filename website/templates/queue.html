@@ -42,7 +42,7 @@
                 </td>
                 {% elif type == "file_path" %}
                 <td>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="printDoc('{{ elem.true_file_path }}', '{{ elem.copies }}', {{ elem.double_sided|lower }}, {{ elem.id }})">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="Print_job('{{ elem.true_file_path }}', '{{ elem.copies }}', {{ elem.double_sided|lower }}, {{ elem.id }})">
                     Imprimer
                     </button>
                     <a href="{{ elem.file_path }}" download>Télécharger</a>
@@ -115,7 +115,7 @@
 </div>
 
 <script>
-    function printDoc(file_path, copies, double_sided, id){
+    function Print_job(file_path, copies, double_sided, id){
         if (double_sided==true){
             document.getElementById('demo').innerHTML = "id:"+id+" | Copies:" + copies + " (Recto-verso)";
         } else {
